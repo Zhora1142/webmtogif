@@ -1,4 +1,4 @@
-from bot import Bot, Update
+from modules.bot import Bot, Update
 
 token = ''
 bot = Bot(token)
@@ -13,8 +13,10 @@ if __name__ == '__main__':
             update = Update(i)
             if update.text == '/start':
                 bot.send_message(update.chat_id, 'Приветствую!')
-            else:
+            elif update.text:
                 bot.send_message(update.chat_id, update.text)
+            else:
+                bot.send_message(update.chat_id, 'что это')
 
         updates = bot.get_updates(offset)
         offset = updates['last_update_id'] + 1
