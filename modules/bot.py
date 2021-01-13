@@ -39,6 +39,17 @@ class Bot:
             if response['ok'] is False:
                 raise Exception(f'{response["error_code"]} {response["description"]}')
 
+    def send_animation(self, chat_id, animation):
+        params = {'chat_id': chat_id}
+        files = {'animation': animation}
+        try:
+            response = requests.post(url=self.url + 'sendAnimation', params=params, files=files).json()
+        except Exception:
+            raise
+        else:
+            if response['ok'] is False:
+                raise Exception(f'{response["error_code"]} {response["description"]}')
+
 
 class Update:
     def __init__(self, update):
