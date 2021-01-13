@@ -1,6 +1,6 @@
 from bot import Bot, Update
 
-token = '1520012046:AAFmCjltg7rosLi0aFktva42rbaezCkD-Z8'
+token = ''
 bot = Bot(token)
 
 
