@@ -24,11 +24,9 @@
   become: yes
   become_user: telegram-bot
 
-- name: creating folder
-  file:
-    path: "{{ application_path }}/config"
-    state: directory
-    mode: '0755'
+- name: install depences
+  command:
+    cmd: "{{ application_path }}/bin/pip install {{ application_path }}/requirements.txt"
   become: yes
   become_user: telegram-bot
 
