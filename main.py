@@ -1,7 +1,8 @@
+import yaml
 from modules.bot import Bot, Update
 
-token = ''
-bot = Bot(token)
+config = yaml.load(open('./config/config.yml', 'r').read())
+bot = Bot(config['token'])
 
 
 if __name__ == '__main__':

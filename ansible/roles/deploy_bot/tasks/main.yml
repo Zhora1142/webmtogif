@@ -1,0 +1,52 @@
+---
+
+- name: stoping bot
+  systemd:
+    name: webmtogif
+    state: stopped
+  ignore_errors: yes
+
+- name: remove current version
+  file:
+    path: "{{ application_path }}"
+    state: absent
+
+- name: fetching repository
+  git:
+    repo: "{{ git_url }}"
+    dest: "{{ application_path }}"
+  become: yes
+  become_user: telegram-bot
+
+- name: creating virtual environment
+  command:
+    cmd: "python3 -m venv {{ application_path }}"
+  become: yes
+  become_user: telegram-bot
+
+- name: creating folder
+  file:
+    path: "{{ application_path }}/config"
+    state: directory
+    mode: '0755'
+  become: yes
+  become_user: telegram-bot
+
+- name: create config
+  template:
+    src: config.yml.j2
+    dest: "{{ application_path }}/config/config.yml"
+    owner: telegram-bot
+    group: telegram-bot
+
+- name: create syslog unit
+  copy:
+    src: "webmtogif.service"
+    dest: "/etc/systemd/system/webmtogif.service"
+    owner: root
+    group: root
+
+- name: starting bot
+  systemd:
+    name: webmtogif
+    state: started
