@@ -10,7 +10,7 @@ class Bot:
             raise
         else:
             if resp['ok'] is False:
-                raise Exception(f'{resp["error_code"]} {resp["description"]}')
+                raise Exception('{} {}'.format({resp["error_code"]}, {resp["description"]}))
 
     def get_updates(self, offset=None, timeout=30):
         params = {'timeout': timeout, 'offset': offset}

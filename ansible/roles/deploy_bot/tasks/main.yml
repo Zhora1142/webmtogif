@@ -26,7 +26,7 @@
 
 - name: install depences
   command:
-    cmd: "{{ application_path }}/bin/pip install {{ application_path }}/requirements.txt"
+    cmd: "{{ application_path }}/bin/pip install -r {{ application_path }}/requirements.txt"
   become: yes
   become_user: telegram-bot
 
