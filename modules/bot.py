@@ -3,7 +3,7 @@ import requests
 
 class Bot:
     def __init__(self, token):
-        self.url = f'https://api.telegram.org/bot{token}/'
+        self.url = 'https://api.telegram.org/bot{}/'.format(token)
         try:
             resp = requests.get(url=self.url + 'getMe').json()
         except Exception:
