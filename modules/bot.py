@@ -21,7 +21,7 @@ class Bot:
                 pass
             else:
                 if response['ok'] is False:
-                    raise Exception(f'{response["error_code"]} {response["description"]}')
+                    raise Exception('{} {}'.format(response["error_code"], response["description"]))
                 else:
                     print('Получено сообщение')
                     if len(response['result']) == 0:
@@ -37,7 +37,7 @@ class Bot:
             raise
         else:
             if response['ok'] is False:
-                raise Exception(f'{response["error_code"]} {response["description"]}')
+                raise Exception('{} {}'.format(response["error_code"], response["description"]))
 
     def send_animation(self, chat_id, animation):
         params = {'chat_id': chat_id}
@@ -48,7 +48,7 @@ class Bot:
             raise
         else:
             if response['ok'] is False:
-                raise Exception(f'{response["error_code"]} {response["description"]}')
+                raise Exception('{} {}'.format(response["error_code"], response["description"]))
 
 
 class Update:
