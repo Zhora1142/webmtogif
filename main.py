@@ -86,7 +86,7 @@ if __name__ == '__main__':
                     if update.isCommand:  # Проверка наличия команды в сообщении
 
                         if update.command == '/start':  # Команда start
-                            bot.send_message(update.chat_id, 'Приветствие')
+                            bot.send_message(update.chat_id, 'Введи /help для просмотра списка команд')
 
                         elif update.command == '/help':  # Комнда load
                             message = 'Список доступных команд:\n\n' \
