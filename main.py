@@ -5,7 +5,7 @@ from threading import Thread
 import re
 import logging
 
-logging.basicConfig(filename='bot.log', filemode='w', format='%(asctime)s - %(levelname)s - %(message)s',
+logging.basicConfig(filename='bot.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 config = yaml.load(open('./config/config.yml', 'r').read())
