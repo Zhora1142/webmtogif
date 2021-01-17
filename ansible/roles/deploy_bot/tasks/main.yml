@@ -5,6 +5,7 @@
     name: webmtogif
     state: stopped
   ignore_errors: yes
+  become: yes
 
 - name: remove current version
   file:
@@ -27,8 +28,6 @@
 - name: install depences
   command:
     cmd: "{{ application_path }}/bin/pip install -r {{ application_path }}/requirements.txt"
-  become: yes
-  become_user: telegram-bot
 
 - name: create config
   template:
@@ -49,3 +48,4 @@
   systemd:
     name: webmtogif
     state: started
+  become: yes
