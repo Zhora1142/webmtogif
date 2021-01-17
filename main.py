@@ -28,7 +28,12 @@ def gif(u):
         else:
             if path['status'] != 'success':
                 logging.warning('Error while downloading file: ' + str(path['error']))
-                bot.edit_message(u.chat_id, msg_id, 'Не удалось скачать файл. Возможно, Вы указали неверную ссылку.')
+                if path['error'] == 'wrong extension':
+                    bot.edit_message(u.chat_id, msg_id,
+                                     'Не удалось скачать файл. Неверное расширение.')
+                else:
+                    bot.edit_message(u.chat_id, msg_id,
+                                     'Не удалось скачать файл. Возможно, Вы указали неверную ссылку.')
 
             else:
                 bot.edit_message(u.chat_id, msg_id, 'Конвертирование файла...')
@@ -58,8 +63,7 @@ def gif(u):
                                 bot.delete_message(u.chat_id, msg_id)
                         finally:
                             c.delete(path2['path'])
-                finally:
-                    c.delete(path['path'])
+                            c.delete(path['path'])
 
 
 def mp4(u):
@@ -78,7 +82,12 @@ def mp4(u):
         else:
             if path['status'] != 'success':
                 logging.warning('Error while downloading file: ' + str(path['error']))
-                bot.edit_message(u.chat_id, msg_id, 'Не удалось скачать файл. Возможно, Вы указали неверную ссылку.')
+                if path['error'] == 'wrong extension':
+                    bot.edit_message(u.chat_id, msg_id,
+                                     'Не удалось скачать файл. Неверное расширение.')
+                else:
+                    bot.edit_message(u.chat_id, msg_id,
+                                     'Не удалось скачать файл. Возможно, Вы указали неверную ссылку.')
 
             else:
                 bot.edit_message(u.chat_id, msg_id, 'Конвертирование файла...')
@@ -108,8 +117,7 @@ def mp4(u):
                                 bot.delete_message(u.chat_id, msg_id)
                         finally:
                             c.delete(path2['path'])
-                finally:
-                    c.delete(path['path'])
+                            c.delete(path['path'])
 
 
 if __name__ == '__main__':
