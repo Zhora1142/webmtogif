@@ -43,7 +43,7 @@
     dest: "/etc/systemd/system/webmtogif.service"
     owner: root
     group: root
-  ignore-errors: yes
+  ignore_errors: yes
 
 - name: starting bot
   systemd:
