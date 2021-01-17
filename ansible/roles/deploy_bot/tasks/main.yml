@@ -1,11 +1,9 @@
 ---
 
 - name: stoping bot
-  systemd:
-    name: webmtogif
-    state: stopped
+  command:
+    cmd: "sudo systemctl stop webmtogif"
   ignore_errors: yes
-  become: yes
 
 - name: remove current version
   file:
@@ -45,7 +43,5 @@
   ignore_errors: yes
 
 - name: starting bot
-  systemd:
-    name: webmtogif
-    state: started
-  become: yes
+  command:
+    cmd: "sudo systemctl start webmtogif"
