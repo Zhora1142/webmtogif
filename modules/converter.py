@@ -24,6 +24,8 @@ class Converter:
             return {'status': 'error', 'error': e}
         else:
             filename = url.split('/').pop()
+            if filename.split('.').pop() != 'webm':
+                return {'status': 'error', 'error': 'wrong extension'}
             file = open(self.WORKDIR+'/files/' + filename, 'wb')
             file.write(source)
             file.close()
