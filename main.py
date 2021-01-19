@@ -17,7 +17,6 @@ bot = Bot(config['token'])
 def video(u):
     c = Converter()
     if 'video' in u.callback['data']:
-        print(u.callback['data'])
         path = getcwd() + '/files/' + u.callback['data'].split('_')[1]
         bot.edit_message(u.chat_id, u.callback['message_id'], 'Конвертирование...')
         try:
@@ -122,9 +121,7 @@ def formatting(u):
                     ]
                 ]
             }
-            res = bot.edit_message(u.chat_id, msg_id, 'Видео успешно загружено. Выберите действие.', dumps(keyboard))
-            if res['status'] != 'ok':
-                print(res['error'])
+            bot.edit_message(u.chat_id, msg_id, 'Видео успешно загружено. Выберите действие.', dumps(keyboard))
         else:
             logging.warning('File loading error: ' + str(result['error']))
             bot.edit_message(u.chat_id, msg_id, 'Не удалось загрузить видео. Возможно, файл, находящийся по ссылке, '
