@@ -27,8 +27,8 @@ class Bot:
                         return {'status': 'ok', 'updates': response['result'],
                                 'last_update_id': response['result'][-1]['update_id']}
 
-    def send_message(self, chat_id, text):
-        params = {'chat_id': chat_id, 'text': text}
+    def send_message(self, chat_id, text, reply_markup=None):
+        params = {'chat_id': chat_id, 'text': text, 'reply_markup': reply_markup}
         try:
             response = requests.get(url=self.url + 'sendMessage', params=params).json()
         except Exception as e:
@@ -89,10 +89,22 @@ class Bot:
             else:
                 return {'status': 'ok'}
 
-    def edit_message(self, chat_id, message_id, text):
-        params = {'chat_id': chat_id, 'message_id': message_id, 'text': text}
+    def edit_message(self, chat_id, message_id, text, reply_markup=None):
+        params = {'chat_id': chat_id, 'message_id': message_id, 'text': text, 'reply_markup': reply_markup}
         try:
             response = requests.get(url=self.url + 'editMessageText', params=params).json()
+        except Exception as e:
+            return {'status': 'error', 'error': e}
+        else:
+            if response['ok'] is False:
+                return {'status': 'error', 'error': '{} {}'.format(response['error_code'], response['description'])}
+            else:
+                return {'status': 'ok'}
+
+    def answer_callback_query(self, callback_query_id):
+        params = {'callback_query_id': callback_query_id}
+        try:
+            response = requests.get(url=self.url + 'answerCallbackQuery', params=params).json()
         except Exception as e:
             return {'status': 'error', 'error': e}
         else:
@@ -104,19 +116,44 @@ class Bot:
 
 class Update:
     def __init__(self, update):
-        self.chat_id = update['message']['chat']['id']
-        if 'text' in update['message']:
-            self.text = update['message']['text']
-        else:
-            self.text = None
-
-        self.isCommand = False
+        self.type = None
+        self.text = None
+        self.chat_id = None
+        self.callback = {}
         self.command = None
-        self.command_offset = None
-        self.command_length = None
+        self.url = None
 
-        if 'entities' in update['message'] and update['message']['entities'][0]['type'] == 'bot_command':
-            self.isCommand = True
-            self.command_offset = update['message']['entities'][0]['offset']
-            self.command_length = update['message']['entities'][0]['length']
-            self.command = self.text[self.command_offset:self.command_offset + self.command_length]
+        if 'callback_query' in update:
+            self.type = 'callback_query'
+            self.chat_id = update['callback_query']['message']['chat']['id']
+            self.callback = {
+                'id': update['callback_query']['id'],
+                'data': update['callback_query']['data'],
+                'message_id': update['callback_query']['message']['message_id']
+            }
+
+        elif 'message' in update:
+            self.chat_id = update['message']['chat']['id']
+            self.type = 'message'
+
+            if 'text' in update['message']:
+                self.text = update['message']['text']
+
+            if 'entities' in update['message']:
+                if update['message']['entities'][0]['type'] == 'bot_command':
+                    self.type = 'command'
+                    temp = {
+                        'offset': update['message']['entities'][0]['offset'],
+                        'length': update['message']['entities'][0]['length']
+                    }
+                    s = temp['offset'] + temp['length']
+                    self.command = self.text[temp['offset']:s]
+
+                elif update['message']['entities'][0]['type'] == 'url':
+                    self.type = 'url'
+                    temp = {
+                        'offset': update['message']['entities'][0]['offset'],
+                        'length': update['message']['entities'][0]['length']
+                    }
+                    s = temp['offset'] + temp['length']
+                    self.url = self.text[temp['offset']:s]
