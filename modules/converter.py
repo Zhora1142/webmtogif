@@ -8,9 +8,10 @@ class Converter:
     def __init__(self):
         self.WORKDIR = getcwd()
 
-    def download(self, url):
+    def download(self, url, name=None):
         """
         Download source video from _url_
+        :param name: filename
         :param url: source video url
         :return: status dict
         """
@@ -26,10 +27,12 @@ class Converter:
             filename = url.split('/').pop()
             if filename.split('.').pop() != 'webm':
                 return {'status': 'error', 'error': 'wrong extension'}
+            if name is not None:
+                filename = str(name) + '.webm'
             file = open(self.WORKDIR+'/files/' + filename, 'wb')
             file.write(source)
             file.close()
-            return {'status': 'success', 'path': self.WORKDIR+'/files/' + filename}
+            return {'status': 'success', 'path': filename}
 
     def to_gif(self, filename):
         """
