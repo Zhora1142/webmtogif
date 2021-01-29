@@ -1,3 +1,5 @@
+from gevent import monkey
+monkey.patch_all()
 import yaml
 from modules.bot import Bot, Update
 from modules.converter import Converter
@@ -6,16 +8,25 @@ import re
 import logging
 from json import dumps
 from os import getcwd
+from TikTokApi import TikTokApi
+import requests
 
 logging.basicConfig(filename='bot.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
 config = yaml.load(open('./config/config.yml', 'r').read())
 bot = Bot(config['token'])
+api = TikTokApi()
+c = Converter()
+
+HEADERS = {
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+                  'AppleWebKit/537.36 (KHTML, like Gecko) '
+                  'Chrome/87.0.4280.141 Safari/537.36'
+}
 
 
 def video(u):
-    c = Converter()
     if 'video' in u.callback['data']:
         path = getcwd() + '/files/' + u.callback['data'].split('_')[1]
         bot.edit_message(u.chat_id, u.callback['message_id'], 'Конвертирование...')
@@ -92,7 +103,6 @@ def video(u):
 
 
 def formatting(u):
-    c = Converter()
     msg_id = bot.send_message(u.chat_id, 'Загрузка видеозаписи...')['message_id']
     try:
         result = c.download(u.url, u.chat_id)
@@ -128,6 +138,40 @@ def formatting(u):
                                                 'имеет расширение отличное от webm.')
 
 
+def tiktok(u):
+    msg_id = bot.send_message(u.chat_id, 'Загрузка видео из TikTok...')['message_id']
+    try:
+        response = requests.get(url=u.url, headers=HEADERS)
+        if len(response.history) == 0:
+            url = response.url
+        else:
+            url = response.history[-1].headers['location']
+        result = api.get_Video_By_Url(video_url=url)
+        file = open(f'files/{u.chat_id}.mp4', 'wb')
+        file.write(result)
+        file.close()
+    except KeyError as e:
+        logging.error('TikTok loading error: ' + str(e))
+        bot.edit_message(u.chat_id, msg_id, 'Не удалось загрузить видео. Возможно, указана неверная ссылка.')
+    except Exception as e:
+        logging.error('TikTok loading error: ' + str(e))
+        bot.edit_message(u.chat_id, msg_id, 'Не удалось загрузить видео.')
+    else:
+        bot.edit_message(u.chat_id, msg_id, 'Отправка видео...')
+        try:
+            result = bot.send_video(u.chat_id, f'files/{u.chat_id}.mp4')
+        except Exception as e:
+            logging.error('Video uploading error: ' + str(e))
+            bot.edit_message(u.chat_id, msg_id, 'Не удалось отправить видео.')
+        else:
+            if result['status'] == 'ok':
+                bot.delete_message(u.chat_id, msg_id)
+                c.delete(f'files/{u.chat_id}.mp4')
+            else:
+                logging.warning('Video uploading error: ' + str(result['error']))
+                bot.edit_message(u.chat_id, msg_id, 'Не удалось отправить видео.')
+
+
 if __name__ == '__main__':
     updates = bot.get_updates()
     if updates['status'] != 'ok':
@@ -146,13 +190,21 @@ if __name__ == '__main__':
                                                      '/help чтобы узнать подробности.')
 
                 elif update.command == '/help':
-                    message = 'Этот бот умеет ковертировать видео из формата webm в mp4 или gif!\n\n' \
-                              'Чтобы начать конвертацию, отправь ссылку на видео и выбери, что хочешь с ним сделать.'
+                    message = 'Этот бот умеет ковертировать видео из формата webm в mp4 или gif, а после присылать ' \
+                              'их тебе, а также загружать видео из TikTok\n\n' \
+                              'Отправь ссылку на видео в формате webm или TikTok и и выбери, что хочешь с ним сделать'
                     bot.send_message(update.chat_id, message)
 
             elif update.type == 'url':
-                t = Thread(target=formatting, args=(update,))
-                t.start()
+                matching = re.match('https://vm\.tiktok\.com/.*|'
+                                    'https://m\.tiktok\.com/v/.*|'
+                                    'https://www\.tiktok\.com/@.*/video/\d*\?', update.url)
+                if matching is None:
+                    t = Thread(target=formatting, args=(update,))
+                    t.start()
+                else:
+                    t = Thread(target=tiktok, args=(update,))
+                    t.start()
 
             elif update.type == 'callback_query':
                 t = Thread(target=video, args=(update,))
