@@ -217,6 +217,7 @@ if __name__ == '__main__':
                     logging.error('Getting updates error {}/9: {}'.format(i, updates['error']))
                 else:
                     logging.fatal('Getting updates error {}/9: {}'.format(i, updates['error']))
+                    exit()
             else:
                 break
             i += 1
