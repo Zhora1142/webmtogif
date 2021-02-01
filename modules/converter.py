@@ -1,7 +1,7 @@
 import subprocess
 import requests
 from os import getcwd, remove
-
+from modules.pikabu import PikabuVideo
 
 class Converter:
 
@@ -15,6 +15,13 @@ class Converter:
         :param url: source video url
         :return: status dict
         """
+        if 'https://pikabu.ru/story/' in url:
+            pikabu = PikabuVideo()
+            video = pikabu.search_video(url)
+            if video['status'] == 'success':
+                url = video['webm-url']
+            elif video['status'] == 'error':
+                return {'status': 'error', 'error': video['error']}
         try:
             req = requests.get(url)
             if 200 <= req.status_code < 400:
