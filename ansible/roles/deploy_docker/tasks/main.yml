@@ -1,0 +1,43 @@
+---
+
+- name: Pull an telegram-bot image
+  docker_image:
+    name: "{{ docker_image }}"
+    source: pull
+
+- name: Stoping bot container
+  docker_container:
+    name: telegram-bot
+    image: telegram-bot
+    state: stopped
+  ignore_errors: yes
+
+- name: Remove sources
+  file:
+    path: "{{ application_path }}"
+    state: absent
+
+- name: Fetching repository
+  git:
+    repo: "{{ git_url }}"
+    version: "{{ git_version }}"
+    dest: "{{ application_path }}"
+
+- name: Create config
+  template:
+    src: config.yml.j2
+    dest: "{{ application_path }}/config/config.yml"
+
+- name: Build image
+  docker_image:
+    name: telegram-bot
+    build:
+      path: "{{ application_path }}/"
+    source: build
+
+- name: Start telegram-bot container
+  docker_container:
+    name: telegram-bot
+    image: telegram-bot
+    state: started
+    recreate: yes

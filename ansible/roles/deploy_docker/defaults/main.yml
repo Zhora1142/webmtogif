@@ -1,0 +1,7 @@
+---
+
+application_path: '/home/telegram-bot/webmtogif'
+git_url: 'https://github.com/Zhora1142/webmtogif.git'
+git_version: 'tiktok-supportion'
+token: ''
+docker_image: 'shmulya/telegram-bot:raw'
