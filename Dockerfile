@@ -1,7 +1,6 @@
-FROM mcr.microsoft.com/playwright:focal
+FROM shmulya/telegram-bot:raw
 
-RUN apt update && apt-get install -y python3-pip
-RUN pip3 install TikTokApi
-RUN python3 -m playwright install
+WORKDIR /bot
 COPY . .
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r requirements.py
+CMD python3 main.py
